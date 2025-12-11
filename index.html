@@ -3,258 +3,96 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>SunMail — add mailbox</title>
+    <title>SunMail — Payment successful</title>
     <style>
       :root {
         --text-primary: #181818;
-        --text-secondary: #6d6b68;
-        --text-on-color: #181818;
-        --control-primary: #ffd53f;
-        --control-primary-hover: #ffe27a;
-        --shadow: 0 16px 48px 0 #3d435433;
+        --success-green: #4caf50;
+        --shadow: 0 16px 48px 0 rgba(61, 67, 52, 0.2);
         --radius: 24px;
       }
-      html,
-      body {
+      html, body {
         height: 100%;
-      }
-      body {
         margin: 0;
-        font-family: "Onest", -apple-system, BlinkMacSystemFont, "Segoe UI",
-          Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
-          "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+        font-family: "Onest", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         background: linear-gradient(152.89deg, #fee6a8 7.69%, #fe9f64 91.36%);
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--text-primary);
       }
       .content {
         background: #fff;
         width: min(536px, 100%);
-        min-height: 300px;
+        padding: 60px 40px;
         border-radius: var(--radius);
         box-shadow: var(--shadow);
-        padding: 60px 64px;
+        text-align: center;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 16px;
+        gap: 24px;
       }
-      .header {
-        width: 100%;
+      .success-icon {
+        width: 80px;
+        height: 80px;
+        background: var(--success-green);
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 12px;
-        margin-bottom: 8px;
-      }
-      .header__logo {
-        width: 194px;
-        height: 40px;
+        font-size: 48px;
+        color: white;
+        font-weight: bold;
       }
       .title {
         margin: 0;
-        font-size: 22px;
-        line-height: 30px;
+        font-size: 28px;
         font-weight: 600;
-        text-align: center;
+        color: var(--text-primary);
       }
       .subtitle {
         margin: 0;
-        font-size: 15px;
-        line-height: 22px;
-        color: var(--text-secondary);
-        text-align: center;
-        word-break: break-word;
-      }
-      .subtitle.error {
-        color: #e10918;
-      }
-      .actions {
-        margin-top: auto;
-        display: flex;
-        gap: 12px;
-        justify-content: center;
-        width: 100%;
-        flex-wrap: wrap;
+        font-size: 18px;
+        color: #2e7d32;
+        font-weight: 500;
       }
       .button {
-        appearance: none;
-        border: 0;
-        outline: 0;
+        margin-top: 12px;
+        padding: 16px 40px;
+        background: var(--success-green);
+        color: white;
+        border: none;
         border-radius: 40px;
-        padding: 14px 24px;
-        width: 408px;
-        height: 56px;
-        font-size: 16px;
+        font-size: 17px;
         font-weight: 500;
         cursor: pointer;
-        background: var(--control-primary);
-        color: var(--text-on-color);
-        transition: background-color 0.15s ease, transform 0.05s ease;
+        transition: background 0.2s;
       }
       .button:hover {
-        background: var(--control-primary-hover);
-      }
-      .button:active {
-        transform: translateY(1px);
-      }
-      .button.secondary {
-        background: #f2f2f2;
+        background: #45a049;
       }
       @media (max-width: 480px) {
-        .content {
-          width: 100%;
-          min-height: auto;
-          padding: 24px 20px;
-          border-radius: 16px;
-          box-shadow: none;
-        }
-        .header__logo {
-          width: 156px;
-          height: 32px;
-        }
-        .title {
-          font-size: 18px;
-          line-height: 24px;
-        }
-        .subtitle {
-          font-size: 14px;
-          line-height: 20px;
-        }
-        .button {
-          height: 52px;
-          font-size: 15px;
-          padding: 12px 20px;
-          border-radius: 32px;
-        }
-      }
-      @media (max-width: 360px) {
-        .content {
-          padding: 20px 16px;
-          border-radius: 14px;
-        }
-        .title {
-          font-size: 17px;
-          line-height: 22px;
-        }
-        .subtitle {
-          font-size: 13px;
-          line-height: 18px;
-        }
-        .button {
-          height: 48px;
-          font-size: 14px;
-          border-radius: 28px;
-        }
+        .content { padding: 40px 20px; border-radius: 16px; box-shadow: none; }
+        .title { font-size: 24px; }
+        .subtitle { font-size: 16px; }
       }
     </style>
     <script>
-      const baseDeepLink = "sunmail://oauth/callback";
-
-      const qs = new URLSearchParams(window.location.search);
-      const code = qs.get("code") || "";
-      const state = qs.get("state") || "";
-      const providerError = qs.get("error") || "";
-      const providerErrorDescription = qs.get("error_description") || "";
-
-      function buildDeepLink(params) {
-        const q = new URLSearchParams(params);
-        return `${baseDeepLink}?${q.toString()}`;
-      }
-
-      function setSubtitle(text, isError = false) {
-        const el = document.querySelector(".subtitle");
-        if (el) {
-          el.textContent = text;
-          el.classList.toggle("error", !!isError);
-        }
-      }
-
-      function deepLinkToApp() {
-        let params;
-        if (code && state) {
-          params = { code, state };
-        } else if (providerError || providerErrorDescription) {
-          params = {
-            status: "error",
-            error: providerError || "oauth_error",
-            error_description:
-              providerErrorDescription || "OAuth provider returned an error",
-          };
-        } else {
-          params = {
-            status: "error",
-            error: "missing_params",
-            error_description: "Missing code/state from OAuth provider",
-          };
-        }
-        window.location.href = buildDeepLink(params);
-      }
-
-      function copyDetails() {
-        const details = JSON.stringify(
-          {
-            code: code || undefined,
-            state: state || undefined,
-            error: providerError || undefined,
-            error_description: providerErrorDescription || undefined,
-          },
-          null,
-          2
-        );
-        try {
-          navigator.clipboard.writeText(details);
-          setSubtitle("Details copied. Now click “Go to app”.");
-        } catch {
-          setSubtitle("Copy failed. Click “Go to app”.", true);
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        if (providerError || providerErrorDescription) {
-          setSubtitle(
-            providerErrorDescription || providerError || "OAuth error occurred",
-            true
-          );
-          return;
-        }
-        if (code && state) {
-          deepLinkToApp();
-          setTimeout(() => {
-            const el = document.querySelector(".subtitle");
-            if (el && !el.classList.contains("error")) {
-              setSubtitle("If nothing happened, click “Go to app”.");
-            }
-          }, 1200);
-        } else {
-          setSubtitle("Missing code/state from OAuth provider.", true);
-        }
-      });
+      setTimeout(() => {
+        window.location.href = "sunmail://payment/success";
+      }, 2000);
 
       function goToApp() {
-        deepLinkToApp();
+        window.location.href = "sunmail://payment/success";
       }
-      window.goToApp = goToApp;
-      function copyInfo() {
-        copyDetails();
-      }
-      window.copyInfo = copyInfo;
     </script>
   </head>
   <body>
     <div class="content">
-      <div class="header" aria-hidden="true">
-        <img class="header__logo" src="Logo.png" alt="SunMail" />
-      </div>
-
-      <h1 class="title">Add mailbox</h1>
-      <p class="subtitle">Redirecting to app...</p>
-
-      <div class="actions">
-        <button class="button" onclick="goToApp()">Go to app</button>
-      </div>
+      <div class="success-icon">✓</div>
+      <h1 class="title">Payment successful!</h1>
+      <p class="subtitle">Welcome to Pro!</p>
+      <button class="button" onclick="goToApp()">Open SunMail</button>
     </div>
   </body>
 </html>

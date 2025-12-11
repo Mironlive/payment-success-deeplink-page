@@ -156,10 +156,18 @@
       }
     </style>
     <script>
-      const appDeepLink = "sunmail:/";
+      const baseDeepLink = "sunmail:/";
+
+      function buildSuccessDeepLink() {
+        const params = new URLSearchParams({
+          status: "success",
+          event: "payment_success",
+        });
+        return `${baseDeepLink}?${params.toString()}`;
+      }
 
       function goToApp() {
-        window.location.href = appDeepLink;
+        window.location.href = buildSuccessDeepLink();
       }
       window.goToApp = goToApp;
 

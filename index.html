@@ -156,8 +156,10 @@
       }
     </style>
     <script>
-      const baseDeepLink = "sunmail:/";
-
+      // Правильный формат deeplink с двойным слешем и path-компонентом
+      const baseDeepLink = "sunmail://payment";
+      
+      // Формируем URL с параметрами для успешной оплаты
       function buildSuccessDeepLink() {
         const params = new URLSearchParams({
           status: "success",
@@ -165,13 +167,19 @@
         });
         return `${baseDeepLink}?${params.toString()}`;
       }
-
+      
+      // Функция для перехода в приложение
       function goToApp() {
+        console.log("Redirecting to app with URL:", buildSuccessDeepLink());
         window.location.href = buildSuccessDeepLink();
       }
+      
+      // Экспортируем для использования в onclick
       window.goToApp = goToApp;
-
+      
+      // Автоматический переход после загрузки страницы
       document.addEventListener("DOMContentLoaded", () => {
+        // Запускаем переход с небольшой задержкой, чтобы пользователь увидел страницу
         setTimeout(() => {
           goToApp();
         }, 1200);
@@ -193,3 +201,4 @@
     </div>
   </body>
 </html>
+```__
